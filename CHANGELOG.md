@@ -3,4 +3,5 @@
 ## [0.0.2]
 ### Added
 - Add create, version, list, deploy sub-command
+- Supported for pypthon 3+
 
