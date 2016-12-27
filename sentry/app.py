@@ -27,7 +27,8 @@ class Sentry(object):
         ('DEBUG', False),
         ('SENTRY_HOST', '127.0.0.1'),
         ('SENTRY_PORT', 8081),
-        ('LOGGER_NAME', 'None')
+        ('LOGGER_NAME', 'None'),
+        ('LOGGER_HANDLER_POLICY', 'always')
     ])
 
     rules = {}
@@ -54,6 +55,7 @@ class Sentry(object):
         return self.config_class(root_path, self.default_config)
 
     def tcp_app(self, socket, address):
+        self.logger.debug('tcp connection establish %s', address)
         start_point = time.time()
         ctx = self.request_context(socket, address)
         ctx.push()
@@ -64,7 +66,7 @@ class Sentry(object):
                 socket.sendall(response)
         finally:
             ctx.pop()
-            self.logger.error('elapse %s', time.time() - start_point)
+            self.logger.info('elapse %s', time.time() - start_point)
 
     def run(self, host=None, port=None, debug=None):
         if host is None:
@@ -75,6 +77,7 @@ class Sentry(object):
         if debug is not None:
             self.debug = bool(debug)
 
+        self.logger.info('%s listening %s:%s', self.import_name, host, port)
         server = StreamServer((host, port), self.tcp_app)
         server.serve_forever()
 
